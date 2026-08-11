@@ -20,7 +20,7 @@
     "@fontsource-variable/m-plus-1": "^5.2.6",
     "@fontsource/dela-gothic-one": "^5.2.6",
     "@fontsource/kiwi-maru": "^5.3.0",
-    "@fontsource/mochiy-pop-one": "^5.2.8",
+    "@fontsource/mochiy-pop-one": "^5.3.0",
     "@pagefind/default-ui": "^1.5.2",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.3",
