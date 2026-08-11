@@ -36,7 +36,7 @@ jobs:
 
       - name: Install, build, and upload your site
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: withastro/action@v3
+        uses: withastro/action@v6
         with:
           node-version: 24
 
