@@ -5,10 +5,10 @@ import "../styles/link-card.css";
 import { SITE_NAME, SITE_DESCRIPTION } from "../consts";
 
 export type Props = {
-	title?: string;
-	description?: string;
-	color?: string;
-	keywords?: string[];
+  title?: string;
+  description?: string;
+  color?: string;
+  keywords?: string[];
 };
 
 const site = Astro.site;
@@ -16,46 +16,46 @@ const { title, description, keywords, color } = Astro.props;
 ---
 
 <html lang="ja">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
 
-		<meta name="keywords" content={(keywords ?? ["プログラミング"]).join(", ")} />
-		<meta name="theme-color" content={color ?? "#00fa9a"} />
-		<meta name="description" content={description ?? SITE_DESCRIPTION} />
+    <meta name="keywords" content={(keywords ?? ["プログラミング"]).join(", ")} />
+    <meta name="theme-color" content={color ?? "#00fa9a"} />
+    <meta name="description" content={description ?? SITE_DESCRIPTION} />
 
-		<title>{title ?? "Home"} / {SITE_NAME}</title>
+    <title>{title ?? "Home"} / {SITE_NAME}</title>
 
-		<meta property="og:url" content={site ? site.toString() : "https://wktk.moe"} />
-		<meta property="og:type" content="website" />
-		<meta property="og:title" content={`${title ?? "Home"} / ${SITE_NAME}`} />
-		<meta property="og:description" content={description ?? SITE_DESCRIPTION} />
-		<meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:url" content={site ? site.toString() : "https://wktk.moe"} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title ?? "Home"} / ${SITE_NAME}`} />
+    <meta property="og:description" content={description ?? SITE_DESCRIPTION} />
+    <meta property="og:site_name" content={SITE_NAME} />
 
-		<meta name="format-detection" content="telephone=no,email=no,address=no" />
+    <meta name="format-detection" content="telephone=no,email=no,address=no" />
 
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:site" content="@AlwaysHarapan" />
-		<meta name="twitter:creator" content="@AlwaysHarapan" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@AlwaysHarapan" />
+    <meta name="twitter:creator" content="@AlwaysHarapan" />
 
-		<script
-			is:inline
-			type="text/partytown"
-			async
-			src="https://www.googletagmanager.com/gtag/js?id=G-VW9R8GHLTZ"></script>
-		<script is:inline type="text/partytown">
-			window.dataLayer = window.dataLayer || [];
-			function gtag() {
-				dataLayer.push(arguments); //eslint-disable-line prefer-rest-params
-			}
-			gtag("js", new Date());
+    <script
+      is:inline
+      type="text/partytown"
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-VW9R8GHLTZ"></script>
+    <script is:inline type="text/partytown">
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments); //eslint-disable-line prefer-rest-params
+      }
+      gtag("js", new Date());
 
-			gtag("config", "G-VW9R8GHLTZ");
-		</script>
-	</head>
-	<body>
-		<slot />
-	</body>
+      gtag("config", "G-VW9R8GHLTZ");
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
 </html>

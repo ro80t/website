@@ -9,52 +9,52 @@ import { getEntry, render } from "astro:content";
 const about = await getEntry("specs", "about");
 
 if (!about) {
-	throw new Error("specs/about.mdx was not found");
+  throw new Error("specs/about.mdx was not found");
 }
 
 const { Content } = await render(about);
 ---
 
 <MainLayout title="About me">
-	<div class="layout" data-pagefind-ignore>
-		<div class="right">
-			<div class="profile">
-				<ContentsBlock>
-					<Profile shortInMobile={false} />
-				</ContentsBlock>
-			</div>
-		</div>
-		<div class="left">
-			<ContentsBlock>
-				<MarkDown>
-					<Content />
-				</MarkDown>
-			</ContentsBlock>
-		</div>
-	</div>
+  <div class="layout" data-pagefind-ignore>
+    <div class="right">
+      <div class="profile">
+        <ContentsBlock>
+          <Profile shortInMobile={false} />
+        </ContentsBlock>
+      </div>
+    </div>
+    <div class="left">
+      <ContentsBlock>
+        <MarkDown>
+          <Content />
+        </MarkDown>
+      </ContentsBlock>
+    </div>
+  </div>
 </MainLayout>
 
 <style>
-	.layout {
-		display: grid;
-		grid-template-columns: 50% 50%;
-	}
-	.profile {
-		overflow: hidden;
-		width: 85%;
-		margin: 0 0 0 auto;
-	}
-	p {
-		color: black;
-	}
+  .layout {
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+  .profile {
+    overflow: hidden;
+    width: 85%;
+    margin: 0 0 0 auto;
+  }
+  p {
+    color: black;
+  }
 
-	@media screen and (max-width: 950px) {
-		.layout {
-			grid-template-columns: 100%;
-		}
-		.profile {
-			width: 100%;
-			margin: 0;
-		}
-	}
+  @media screen and (max-width: 950px) {
+    .layout {
+      grid-template-columns: 100%;
+    }
+    .profile {
+      width: 100%;
+      margin: 0;
+    }
+  }
 </style>

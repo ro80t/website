@@ -9,12 +9,12 @@ import { fileURLToPath } from "node:url";
 const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url));
 
 export default defineConfig([
-	includeIgnoreFile(gitignorePath),
-	js.configs.recommended,
-	...tseslint.configs.recommended,
-	...eslintPluginAstro.configs.recommended,
-	prettier,
-	{
-		ignores: ["eslint.config.js"]
-	}
+  includeIgnoreFile(gitignorePath),
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...eslintPluginAstro.configs.recommended,
+  prettier,
+  {
+    ignores: ["eslint.config.js"]
+  }
 ]);

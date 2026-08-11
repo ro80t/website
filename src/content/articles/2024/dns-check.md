@@ -24,11 +24,11 @@ dnsライブラリには同期のdnsと非同期のdns/promisesがあるので�
 const dns = require("dns");
 
 dns.resolveTxt("_discord.wktk.moe", (err, records) => {
-	if (err) {
-		throw new Error(String(err));
-	} else {
-		console.log(records);
-	}
+  if (err) {
+    throw new Error(String(err));
+  } else {
+    console.log(records);
+  }
 });
 ```
 
@@ -50,12 +50,12 @@ dns.resolveTxt("_discord.wktk.moe", (err, records) => {
 const dns = require("dns/promises");
 
 async function main() {
-	try {
-		let records = await dns.resolveTxt("_discord.wktk.moe");
-		console.log(records);
-	} catch (error) {
-		throw new Error(error);
-	}
+  try {
+    let records = await dns.resolveTxt("_discord.wktk.moe");
+    console.log(records);
+  } catch (error) {
+    throw new Error(error);
+  }
 }
 
 main();
@@ -79,11 +79,11 @@ main();
 import dns from "dns";
 
 dns.resolveTxt("_discord.wktk.moe", (err, records) => {
-	if (err) {
-		throw new Error(String(err));
-	} else {
-		console.log(records);
-	}
+  if (err) {
+    throw new Error(String(err));
+  } else {
+    console.log(records);
+  }
 });
 ```
 
@@ -93,11 +93,11 @@ dns.resolveTxt("_discord.wktk.moe", (err, records) => {
 import dns from "dns/promises";
 
 (async () => {
-	try {
-		console.log(await dns.resolveTxt("_discord.wktk.moe"));
-	} catch (error) {
-		throw new Error(String(error));
-	}
+  try {
+    console.log(await dns.resolveTxt("_discord.wktk.moe"));
+  } catch (error) {
+    throw new Error(String(error));
+  }
 })();
 ```
 
