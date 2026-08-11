@@ -8,68 +8,68 @@ import ContentsBlock from "../components/ContentsBlock.astro";
 import { parseDate } from "../lib/date";
 
 export type Props = {
-	id: string;
-	title: string;
-	pubDate: Date;
-	updatedDate: Date;
-	description?: string;
-	color?: string;
-	keywords?: string[];
+  id: string;
+  title: string;
+  pubDate: Date;
+  updatedDate: Date;
+  description?: string;
+  color?: string;
+  keywords?: string[];
 };
 
 const props = Astro.props;
 const { title, pubDate, updatedDate, id } = Astro.props;
 const editUrl = new URL(
-	id,
-	"https://github.com/ro80t/website/blob/main/src/content/articles/"
+  id,
+  "https://github.com/ro80t/website/blob/main/src/content/articles/"
 ).toString();
 ---
 
 <Layout {...props}>
-	<div
-		class="layout"
-		data-pagefind-meta={`date:${updatedDate.getFullYear()}-${updatedDate.getMonth() + 1}-${updatedDate.getDate()}`}
-	>
-		<div>
-			<Header />
-			<ContentsBlock>
-				<div>
-					<p class="article-title">{title}</p>
-					<p><small>公開日: {parseDate(pubDate)}</small></p>
-					<p><small>最終更新日: {parseDate(updatedDate)}</small></p>
-				</div>
-			</ContentsBlock>
-			<ContentsBlock>
-				<MarkDown>
-					<slot />
-				</MarkDown>
-			</ContentsBlock>
-			<ContentsBlock>
-				<div>
-					<p>その他の記事は<strong><a href="/articles">こちら</a></strong></p>
-					<p>
-						編集は
-						<strong>
-							<a href={editUrl} target="_blank" rel="noopener noreferrer"> こちら </a>
-						</strong>
-						から
-					</p>
-				</div>
-			</ContentsBlock>
-		</div>
-		<div>
-			<Footer />
-		</div>
-	</div>
+  <div
+    class="layout"
+    data-pagefind-meta={`date:${updatedDate.getFullYear()}-${updatedDate.getMonth() + 1}-${updatedDate.getDate()}`}
+  >
+    <div>
+      <Header />
+      <ContentsBlock>
+        <div>
+          <p class="article-title">{title}</p>
+          <p><small>公開日: {parseDate(pubDate)}</small></p>
+          <p><small>最終更新日: {parseDate(updatedDate)}</small></p>
+        </div>
+      </ContentsBlock>
+      <ContentsBlock>
+        <MarkDown>
+          <slot />
+        </MarkDown>
+      </ContentsBlock>
+      <ContentsBlock>
+        <div>
+          <p>その他の記事は<strong><a href="/articles">こちら</a></strong></p>
+          <p>
+            編集は
+            <strong>
+              <a href={editUrl} target="_blank" rel="noopener noreferrer"> こちら </a>
+            </strong>
+            から
+          </p>
+        </div>
+      </ContentsBlock>
+    </div>
+    <div>
+      <Footer />
+    </div>
+  </div>
 </Layout>
 
 <style>
-	.layout {
-		display: grid;
-		min-height: 100vh;
-		grid-template-rows: 1fr auto;
-	}
-	.article-title {
-		font-size: 26px;
-	}
+  .layout {
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: 1fr auto;
+  }
+  .article-title {
+    font-size: 26px;
+  }
 </style>

@@ -6,61 +6,61 @@ import { REPOSITORY } from "../consts";
 ---
 
 <header data-pagefind-ignore>
-	<div class="main bg-white">
-		<div class="main-contents">
-			<div>
-				<a href="/">
-					<h1 class="title">Wktk.moe</h1>
-				</a>
-				<a href="/about">
-					<h1 class="link">About</h1>
-				</a>
-				<a href="/articles">
-					<h1 class="link">Articles</h1>
-				</a>
-			</div>
+  <div class="main bg-white">
+    <div class="main-contents">
+      <div>
+        <a href="/">
+          <h1 class="title">Wktk.moe</h1>
+        </a>
+        <a href="/about">
+          <h1 class="link">About</h1>
+        </a>
+        <a href="/articles">
+          <h1 class="link">Articles</h1>
+        </a>
+      </div>
 
-			<div>
-				<a href={REPOSITORY.url} class="links" target="_blank" rel="noopener noreferrer">
-					<h1>GITHUB</h1>
-				</a>
-			</div>
-		</div>
-	</div>
+      <div>
+        <a href={REPOSITORY.url} class="links" target="_blank" rel="noopener noreferrer">
+          <h1>GITHUB</h1>
+        </a>
+      </div>
+    </div>
+  </div>
 </header>
 
 <style>
-	header {
-		overflow: hidden;
-		width: 100%;
-	}
-	.main {
-		border-radius: 0 0 25px 25px;
-		overflow: hidden;
-		width: 85%;
-		margin: 0 auto 10px;
-	}
-	.main-contents {
-		overflow: hidden;
-		margin: 14px;
-		display: grid;
-		grid-template-columns: 1fr auto;
-	}
-	.main-contents a {
-		margin: 0 3px;
-		display: inline-block;
-		font-family: "Kiwi Maru", serif;
-	}
-	.title {
-		font-family: "Dela Gothic One", system-ui;
-	}
-	.link {
-		margin-left: 3px;
-	}
+  header {
+    overflow: hidden;
+    width: 100%;
+  }
+  .main {
+    border-radius: 0 0 25px 25px;
+    overflow: hidden;
+    width: 85%;
+    margin: 0 auto 10px;
+  }
+  .main-contents {
+    overflow: hidden;
+    margin: 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+  .main-contents a {
+    margin: 0 3px;
+    display: inline-block;
+    font-family: "Kiwi Maru", serif;
+  }
+  .title {
+    font-family: "Dela Gothic One", system-ui;
+  }
+  .link {
+    margin-left: 3px;
+  }
 
-	@media screen and (max-width: 800px) {
-		.main {
-			width: 100%;
-		}
-	}
+  @media screen and (max-width: 800px) {
+    .main {
+      width: 100%;
+    }
+  }
 </style>

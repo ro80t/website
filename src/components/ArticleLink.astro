@@ -4,51 +4,51 @@ import "@fontsource-variable/m-plus-1";
 import ContentsBlock from "./ContentsBlock.astro";
 
 export type Props = {
-	url: string;
-	title: string;
+  url: string;
+  title: string;
 };
 
 const { url, title } = Astro.props;
 ---
 
 <ContentsBlock>
-	<div class="layout">
-		<div>
-			<p class="article-title">
-				<a href={url}><strong class="title">{title}</strong></a>
-			</p>
-		</div>
-		<div>
-			<a href={url}>
-				<img src="/arrow/right.webp" alt="" />
-			</a>
-		</div>
-	</div>
+  <div class="layout">
+    <div>
+      <p class="article-title">
+        <a href={url}><strong class="title">{title}</strong></a>
+      </p>
+    </div>
+    <div>
+      <a href={url}>
+        <img src="/arrow/right.webp" alt="" />
+      </a>
+    </div>
+  </div>
 </ContentsBlock>
 
 <style>
-	.layout {
-		overflow: hidden;
-		height: 36px;
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		align-items: center;
-	}
-	.layout div img {
-		height: 36px;
-	}
-	.article-title {
-		font-size: 14px;
-		font-family: "M PLUS 1 Variable", sans-serif;
-		overflow: hidden;
-	}
-	.article-title a {
-		overflow: hidden;
-	}
-	.title {
-		display: block;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
+  .layout {
+    overflow: hidden;
+    height: 36px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  .layout div img {
+    height: 36px;
+  }
+  .article-title {
+    font-size: 14px;
+    font-family: "M PLUS 1 Variable", sans-serif;
+    overflow: hidden;
+  }
+  .article-title a {
+    overflow: hidden;
+  }
+  .title {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 </style>

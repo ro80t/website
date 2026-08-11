@@ -10,56 +10,56 @@ import Profile from "../components/Profile.astro";
 import { getCollection } from "astro:content";
 
 const articles = (await getCollection("articles"))
-	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-	.slice(0, 30);
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 30);
 ---
 
 <MainLayout>
-	<div class="layout" data-pagefind-ignore>
-		<div class="right">
-			<div class="profile">
-				<ContentsBlock>
-					<Profile />
-				</ContentsBlock>
-			</div>
-		</div>
-		<div class="left">
-			{
-				articles.map(({ data, id }) =>
-					!data.draft ? <ArticleLink title={data.title} url={`/articles/${id}`} /> : null
-				)
-			}
-			<ContentsBlock>
-				<p class="other-article text-center"><a href="/articles">他の記事も見る</a></p>
-			</ContentsBlock>
-		</div>
-	</div>
+  <div class="layout" data-pagefind-ignore>
+    <div class="right">
+      <div class="profile">
+        <ContentsBlock>
+          <Profile />
+        </ContentsBlock>
+      </div>
+    </div>
+    <div class="left">
+      {
+        articles.map(({ data, id }) =>
+          !data.draft ? <ArticleLink title={data.title} url={`/articles/${id}`} /> : null
+        )
+      }
+      <ContentsBlock>
+        <p class="other-article text-center"><a href="/articles">他の記事も見る</a></p>
+      </ContentsBlock>
+    </div>
+  </div>
 </MainLayout>
 
 <style>
-	.layout {
-		display: grid;
-		grid-template-columns: 50% 50%;
-	}
-	.profile {
-		overflow: hidden;
-		width: 85%;
-		margin: 0 0 0 auto;
-	}
-	.other-article {
-		font-family: "M PLUS 1 Variable", sans-serif;
-	}
-	p {
-		color: black;
-	}
+  .layout {
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+  .profile {
+    overflow: hidden;
+    width: 85%;
+    margin: 0 0 0 auto;
+  }
+  .other-article {
+    font-family: "M PLUS 1 Variable", sans-serif;
+  }
+  p {
+    color: black;
+  }
 
-	@media screen and (max-width: 950px) {
-		.layout {
-			grid-template-columns: 100%;
-		}
-		.profile {
-			width: 100%;
-			margin: 0;
-		}
-	}
+  @media screen and (max-width: 950px) {
+    .layout {
+      grid-template-columns: 100%;
+    }
+    .profile {
+      width: 100%;
+      margin: 0;
+    }
+  }
 </style>
