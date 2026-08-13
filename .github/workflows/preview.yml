@@ -1,0 +1,146 @@
+name: Preview
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, closed]
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  PAGE_DIR: pr-preview-${{ github.event.pull_request.number }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          BASE_PATH: /${{ env.PAGE_DIR }}/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-preview
+          path: dist/
+          retention-days: 1
+
+  preview:
+    name: Deploy preview
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Checkout or create gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages 2>/dev/null
+          if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . > /dev/null
+          fi
+
+      - name: Download artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: site-preview
+          path: ${{ env.PAGE_DIR }}
+
+      - name: Commit and push
+        run: |
+          touch .nojekyll
+          git add .
+          git diff --staged --quiet || git commit -m "Deploy PR preview for #${{ github.event.pull_request.number }}"
+          git push origin gh-pages
+
+      - name: Comment PR
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const url = `https://wktk.moe/${process.env.PAGE_DIR}/`;
+            const marker = "<!-- pr-preview-comment -->";
+            const body = `${marker}\n🔍 Preview deployed to: ${url}`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            const existing = comments.find((comment) => comment.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
+              });
+            }
+
+  cleanup:
+    name: Cleanup preview
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Checkout gh-pages
+        id: checkout-gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages 2>/dev/null || echo "skip=true" >> "$GITHUB_OUTPUT"
+          git rev-parse --verify origin/gh-pages >/dev/null 2>&1 && git checkout gh-pages || echo "skip=true" >> "$GITHUB_OUTPUT"
+
+      - name: Remove preview directory
+        if: steps.checkout-gh-pages.outputs.skip != 'true'
+        run: |
+          rm -rf "${{ env.PAGE_DIR }}"
+          git add .
+          git diff --staged --quiet || git commit -m "Remove PR preview for #${{ github.event.pull_request.number }}"
+          git push origin gh-pages

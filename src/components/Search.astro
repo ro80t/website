@@ -20,6 +20,7 @@ import "@pagefind/default-ui/css/ui.css";
   import { PagefindUI } from "@pagefind/default-ui";
 
   new PagefindUI({
-    element: "#search"
+    element: "#search",
+    bundlePath: `${import.meta.env.BASE_URL}pagefind/`
   });
 </script>

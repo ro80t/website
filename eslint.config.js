@@ -16,5 +16,13 @@ export default defineConfig([
   prettier,
   {
     ignores: ["eslint.config.js"]
+  },
+  {
+    files: ["astro.config.mjs"],
+    languageOptions: {
+      globals: {
+        process: "readonly"
+      }
+    }
   }
 ]);
