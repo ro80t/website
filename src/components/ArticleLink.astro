@@ -20,7 +20,7 @@ const { url, title } = Astro.props;
     </div>
     <div>
       <a href={url}>
-        <img src="/arrow/right.webp" alt="" />
+        <img src={`${import.meta.env.BASE_URL}arrow/right.webp`} alt="" />
       </a>
     </div>
   </div>

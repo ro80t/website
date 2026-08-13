@@ -34,24 +34,53 @@ jobs:
       - name: Build Check
         run: npm run build
 
-      - name: Install, build, and upload your site
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: withastro/action@v6
-        with:
-          node-version: 24
-
   deploy:
+    name: Deploy
     needs: ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      contents: write
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Checkout gh-pages worktree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:gh-pages 2>/dev/null \
+            && git worktree add gh-pages gh-pages \
+            || git worktree add --orphan -b gh-pages gh-pages
+
+      - name: Publish site to gh-pages
+        run: |
+          find gh-pages -mindepth 1 -maxdepth 1 \
+            ! -name '.git' \
+            ! -name 'pr-preview-*' \
+            -exec rm -rf {} +
+          cp -r dist/. gh-pages/
+          touch gh-pages/.nojekyll
+
+      - name: Commit and push
+        working-directory: gh-pages
+        run: |
+          git add .
+          git diff --staged --quiet || git commit -m "Deploy ${{ github.sha }}"
+          git push origin gh-pages

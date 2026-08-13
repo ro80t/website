@@ -51,7 +51,7 @@ const shortInMobile = Astro.props.shortInMobile ?? true;
 </div>
 <div class={`sub-head ${shortInMobile ? "about-link" : "hidden"}`}>
   <p>
-    <a href="/about">詳細を閲覧</a>
+    <a href={`${import.meta.env.BASE_URL}about`}>詳細を閲覧</a>
   </p>
 </div>
 
