@@ -5,7 +5,7 @@ import Profile from "../components/Profile.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 
-import { fetchRepoStats } from "../lib/github";
+import { fetchLanguageStats, fetchRepoStats, getLanguageColor } from "../lib/github";
 import { GITHUB_USERNAME, PORTFOLIO_PROJECTS } from "../consts";
 import { getEntry, render } from "astro:content";
 
@@ -16,6 +16,8 @@ if (!portfolio) {
 }
 
 const { Content } = await render(portfolio);
+
+const languageStats = await fetchLanguageStats(GITHUB_USERNAME);
 
 const projects = await Promise.all(
   PORTFOLIO_PROJECTS.map(async ({ owner, repo }) => {
@@ -45,6 +47,36 @@ const projects = await Promise.all(
       <ContentsBlock>
         <MarkDown>
           <Content />
+          {
+            languageStats && languageStats.length > 0 && (
+              <>
+                <h2>使用言語</h2>
+                <div class="not-prose language-stats">
+                  <div class="language-bar">
+                    {languageStats.map((lang) => (
+                      <span
+                        class="language-bar-segment"
+                        style={`width: ${lang.percentage}%; background-color: ${getLanguageColor(lang.name)};`}
+                        title={`${lang.name} ${lang.percentage.toFixed(1)}%`}
+                      />
+                    ))}
+                  </div>
+                  <ul class="language-legend">
+                    {languageStats.map((lang) => (
+                      <li>
+                        <span
+                          class="language-dot"
+                          style={`background-color: ${getLanguageColor(lang.name)};`}
+                        />
+                        <span>{lang.name}</span>
+                        <span class="language-percentage">{lang.percentage.toFixed(1)}%</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            )
+          }
           <h2>Projects</h2>
           <div class="not-prose projects">
             {projects.map((project) => <ProjectCard {...project} />)}
@@ -64,6 +96,44 @@ const projects = await Promise.all(
     overflow: hidden;
     width: 85%;
     margin: 0 0 0 auto;
+  }
+  .language-stats {
+    margin-top: 4px;
+  }
+  .language-bar {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    height: 10px;
+    border-radius: 6px;
+    background-color: #f5f5f5;
+  }
+  .language-bar-segment {
+    height: 100%;
+  }
+  .language-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 10px;
+    padding: 0;
+  }
+  .language-legend li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    font-size: 13px;
+    color: black;
+  }
+  .language-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .language-percentage {
+    color: gray;
   }
   .projects {
     margin-top: 16px;
