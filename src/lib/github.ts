@@ -11,6 +11,18 @@ function authHeaders(token?: string): Record<string, string> {
   return headers;
 }
 
+export function getGithubProfileUrl(username: string): string {
+  return `https://github.com/${username}`;
+}
+
+export function getPastYearContributionUrl(username: string): string {
+  const formatDate = (date: Date) => date.toISOString().slice(0, 10);
+  const now = new Date();
+  const oneYearAgo = new Date(now);
+  oneYearAgo.setUTCFullYear(now.getUTCFullYear() - 1);
+  return `${getGithubProfileUrl(username)}?tab=overview&from=${formatDate(oneYearAgo)}&to=${formatDate(now)}`;
+}
+
 export type ContributionStats = {
   totalContributions: number;
   lastYearContributions: number;
@@ -108,6 +120,14 @@ export type LanguageStat = {
   percentage: number;
 };
 
+export type AccountStats = {
+  totalRepos: number;
+  followers: number;
+  following: number;
+  totalStars: number;
+  languageStats: LanguageStat[];
+};
+
 export const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: "#3178c6",
   JavaScript: "#f1e05a",
@@ -153,37 +173,53 @@ async function mapWithConcurrency<T>(items: T[], limit: number, fn: (item: T) =>
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
 }
 
-const languageStatsCache = new Map<string, Promise<LanguageStat[] | null>>();
+type RepoSummary = { name: string; fork: boolean; stargazers_count: number };
 
-export function fetchLanguageStats(username: string): Promise<LanguageStat[] | null> {
-  const cached = languageStatsCache.get(username);
+const accountStatsCache = new Map<string, Promise<AccountStats | null>>();
+
+export function fetchAccountStats(username: string): Promise<AccountStats | null> {
+  const cached = accountStatsCache.get(username);
   if (cached) return cached;
 
-  const promise = (async (): Promise<LanguageStat[] | null> => {
+  const promise = (async (): Promise<AccountStats | null> => {
     const token = getToken();
     const headers = authHeaders(token);
 
     try {
-      const repos: { name: string; fork: boolean }[] = [];
-      for (let page = 1; ; page++) {
-        const res = await fetch(
-          `${GITHUB_API}/users/${username}/repos?type=owner&per_page=100&page=${page}`,
-          { headers }
+      const userRes = await fetch(`${GITHUB_API}/users/${username}`, { headers });
+      if (!userRes.ok) {
+        console.warn(
+          `[github] Failed to fetch user profile for ${username} (status ${userRes.status})`
         );
+        return null;
+      }
+      const userJson = await userRes.json();
+
+      // The authenticated "/user/repos" endpoint also returns private repos owned by the
+      // token holder; the public "/users/{username}/repos" endpoint never does.
+      const repoListUrl = token
+        ? `${GITHUB_API}/user/repos?type=owner&per_page=100`
+        : `${GITHUB_API}/users/${username}/repos?type=owner&per_page=100`;
+
+      const repos: RepoSummary[] = [];
+      for (let page = 1; ; page++) {
+        const res = await fetch(`${repoListUrl}&page=${page}`, { headers });
         if (!res.ok) {
           console.warn(
             `[github] Failed to list repositories for ${username} (status ${res.status})`
           );
           break;
         }
-        const batch = (await res.json()) as { name: string; fork: boolean }[];
+        const batch = (await res.json()) as RepoSummary[];
         repos.push(...batch);
         if (batch.length < 100) break;
       }
 
+      const totalRepos = repos.length;
       const ownRepos = repos.filter((repo) => !repo.fork);
-      const totals = new Map<string, number>();
+      const totalStars = ownRepos.reduce((sum, repo) => sum + (repo.stargazers_count ?? 0), 0);
 
+      const totals = new Map<string, number>();
       await mapWithConcurrency(ownRepos, LANGUAGE_FETCH_CONCURRENCY, async (repo) => {
         const res = await fetch(`${GITHUB_API}/repos/${username}/${repo.name}/languages`, {
           headers
@@ -196,33 +232,74 @@ export function fetchLanguageStats(username: string): Promise<LanguageStat[] | n
       });
 
       const totalBytes = [...totals.values()].reduce((sum, bytes) => sum + bytes, 0);
-      if (totalBytes === 0) return null;
+      let languageStats: LanguageStat[] = [];
+      if (totalBytes > 0) {
+        const sorted = [...totals.entries()]
+          .map(([name, bytes]) => ({ name, bytes, percentage: (bytes / totalBytes) * 100 }))
+          .sort((a, b) => b.bytes - a.bytes);
 
-      const sorted = [...totals.entries()]
-        .map(([name, bytes]) => ({ name, bytes, percentage: (bytes / totalBytes) * 100 }))
-        .sort((a, b) => b.bytes - a.bytes);
+        if (sorted.length <= LANGUAGE_TOP_N) {
+          languageStats = sorted;
+        } else {
+          const top = sorted.slice(0, LANGUAGE_TOP_N);
+          const otherBytes = sorted
+            .slice(LANGUAGE_TOP_N)
+            .reduce((sum, lang) => sum + lang.bytes, 0);
+          top.push({
+            name: "Other",
+            bytes: otherBytes,
+            percentage: (otherBytes / totalBytes) * 100
+          });
+          languageStats = top;
+        }
+      }
 
-      if (sorted.length <= LANGUAGE_TOP_N) return sorted;
-
-      const top = sorted.slice(0, LANGUAGE_TOP_N);
-      const otherBytes = sorted.slice(LANGUAGE_TOP_N).reduce((sum, lang) => sum + lang.bytes, 0);
-      top.push({ name: "Other", bytes: otherBytes, percentage: (otherBytes / totalBytes) * 100 });
-      return top;
+      return {
+        totalRepos,
+        followers: userJson.followers ?? 0,
+        following: userJson.following ?? 0,
+        totalStars,
+        languageStats
+      };
     } catch (error) {
-      console.warn(`[github] Failed to fetch language stats for ${username}`, error);
+      console.warn(`[github] Failed to fetch account stats for ${username}`, error);
       return null;
     }
   })();
 
-  languageStatsCache.set(username, promise);
+  accountStatsCache.set(username, promise);
   return promise;
+}
+
+async function fetchCommitCount(
+  owner: string,
+  repo: string,
+  headers: Record<string, string>,
+  author?: string
+): Promise<number | null> {
+  const authorParam = author ? `&author=${encodeURIComponent(author)}` : "";
+  const res = await fetch(`${GITHUB_API}/repos/${owner}/${repo}/commits?per_page=1${authorParam}`, {
+    headers
+  });
+  if (!res.ok) {
+    console.warn(
+      `[github] Failed to fetch commit count for ${owner}/${repo} (status ${res.status})`
+    );
+    return null;
+  }
+  const link = res.headers.get("link");
+  const lastPageMatch = link?.match(/[?&]page=(\d+)>; rel="last"/);
+  if (lastPageMatch) return Number(lastPageMatch[1]);
+  const commits = await res.json();
+  return Array.isArray(commits) ? commits.length : 0;
 }
 
 export type RepoStats = {
   description: string | null;
   language: string | null;
   url: string;
-  commitCount: number | null;
+  totalCommitCount: number | null;
+  authorCommitCount: number | null;
 };
 
 const repoStatsCache = new Map<string, Promise<RepoStats>>();
@@ -239,39 +316,25 @@ export function fetchRepoStats(owner: string, repo: string, author: string): Pro
       description: null,
       language: null,
       url: `https://github.com/${owner}/${repo}`,
-      commitCount: null
+      totalCommitCount: null,
+      authorCommitCount: null
     };
 
     try {
       const repoRes = await fetch(`${GITHUB_API}/repos/${owner}/${repo}`, { headers });
       const repoJson = repoRes.ok ? await repoRes.json() : null;
 
-      const commitsRes = await fetch(
-        `${GITHUB_API}/repos/${owner}/${repo}/commits?author=${encodeURIComponent(author)}&per_page=1`,
-        { headers }
-      );
-
-      let commitCount: number | null = null;
-      if (commitsRes.ok) {
-        const link = commitsRes.headers.get("link");
-        const lastPageMatch = link?.match(/[?&]page=(\d+)>; rel="last"/);
-        if (lastPageMatch) {
-          commitCount = Number(lastPageMatch[1]);
-        } else {
-          const commits = await commitsRes.json();
-          commitCount = Array.isArray(commits) ? commits.length : 0;
-        }
-      } else {
-        console.warn(
-          `[github] Failed to fetch commit count for ${owner}/${repo} (status ${commitsRes.status})`
-        );
-      }
+      const [totalCommitCount, authorCommitCount] = await Promise.all([
+        fetchCommitCount(owner, repo, headers),
+        fetchCommitCount(owner, repo, headers, author)
+      ]);
 
       return {
         description: repoJson?.description ?? null,
         language: repoJson?.language ?? null,
         url: repoJson?.html_url ?? fallback.url,
-        commitCount
+        totalCommitCount,
+        authorCommitCount
       };
     } catch (error) {
       console.warn(`[github] Failed to fetch repo stats for ${owner}/${repo}`, error);

@@ -4,7 +4,11 @@ import "@fontsource/mochiy-pop-one";
 import Link from "./Link.astro";
 import Icon from "../../public/icon.webp";
 
-import { fetchContributionStats } from "../lib/github";
+import {
+  fetchContributionStats,
+  getGithubProfileUrl,
+  getPastYearContributionUrl
+} from "../lib/github";
 import { GITHUB_USERNAME, PROFILE } from "../consts";
 import { Image } from "astro:assets";
 
@@ -15,13 +19,8 @@ export type Props = {
 const shortInMobile = Astro.props.shortInMobile ?? true;
 const contributionStats = await fetchContributionStats(GITHUB_USERNAME);
 
-const githubProfileUrl = `https://github.com/${GITHUB_USERNAME}`;
-
-const formatDate = (date: Date) => date.toISOString().slice(0, 10);
-const now = new Date();
-const oneYearAgo = new Date(now);
-oneYearAgo.setUTCFullYear(now.getUTCFullYear() - 1);
-const pastYearUrl = `${githubProfileUrl}?tab=overview&from=${formatDate(oneYearAgo)}&to=${formatDate(now)}`;
+const githubProfileUrl = getGithubProfileUrl(GITHUB_USERNAME);
+const pastYearUrl = getPastYearContributionUrl(GITHUB_USERNAME);
 ---
 
 <div class="profile-txts">

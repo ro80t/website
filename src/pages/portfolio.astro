@@ -5,7 +5,14 @@ import Profile from "../components/Profile.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 
-import { fetchLanguageStats, fetchRepoStats, getLanguageColor } from "../lib/github";
+import {
+  fetchAccountStats,
+  fetchContributionStats,
+  fetchRepoStats,
+  getGithubProfileUrl,
+  getLanguageColor,
+  getPastYearContributionUrl
+} from "../lib/github";
 import { GITHUB_USERNAME, PORTFOLIO_PROJECTS } from "../consts";
 import { getEntry, render } from "astro:content";
 
@@ -17,7 +24,12 @@ if (!portfolio) {
 
 const { Content } = await render(portfolio);
 
-const languageStats = await fetchLanguageStats(GITHUB_USERNAME);
+const accountStats = await fetchAccountStats(GITHUB_USERNAME);
+const contributionStats = await fetchContributionStats(GITHUB_USERNAME);
+const languageStats = accountStats?.languageStats ?? null;
+
+const githubProfileUrl = getGithubProfileUrl(GITHUB_USERNAME);
+const pastYearUrl = getPastYearContributionUrl(GITHUB_USERNAME);
 
 const projects = await Promise.all(
   PORTFOLIO_PROJECTS.map(async ({ owner, repo }) => {
@@ -27,7 +39,8 @@ const projects = await Promise.all(
       description: stats.description ?? "",
       url: stats.url,
       repository: stats.url,
-      commitCount: stats.commitCount,
+      totalCommitCount: stats.totalCommitCount,
+      authorCommitCount: stats.authorCommitCount,
       tags: stats.language ? [stats.language] : []
     };
   })
@@ -47,6 +60,61 @@ const projects = await Promise.all(
       <ContentsBlock>
         <MarkDown>
           <Content />
+          {
+            (contributionStats || accountStats) && (
+              <>
+                <h2>GitHub Stats</h2>
+                <div class="not-prose github-stats">
+                  {contributionStats && (
+                    <div class="contribution-stats">
+                      <a
+                        class="contribution-stat"
+                        href={githubProfileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <p class="contribution-stat-value">
+                          {contributionStats.totalContributions.toLocaleString()}
+                        </p>
+                        <p class="contribution-stat-label">Total Contributions</p>
+                      </a>
+                      <a
+                        class="contribution-stat"
+                        href={pastYearUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <p class="contribution-stat-value">
+                          {contributionStats.lastYearContributions.toLocaleString()}
+                        </p>
+                        <p class="contribution-stat-label">Past Year</p>
+                      </a>
+                    </div>
+                  )}
+                  {accountStats && (
+                    <div class="github-stats-grid">
+                      <div class="stat-box">
+                        <p class="stat-value">{accountStats.totalRepos.toLocaleString()}</p>
+                        <p class="stat-label">Repositories</p>
+                      </div>
+                      <div class="stat-box">
+                        <p class="stat-value">{accountStats.followers.toLocaleString()}</p>
+                        <p class="stat-label">Followers</p>
+                      </div>
+                      <div class="stat-box">
+                        <p class="stat-value">{accountStats.following.toLocaleString()}</p>
+                        <p class="stat-label">Following</p>
+                      </div>
+                      <div class="stat-box">
+                        <p class="stat-value">{accountStats.totalStars.toLocaleString()}</p>
+                        <p class="stat-label">Total Stars</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )
+          }
           {
             languageStats && languageStats.length > 0 && (
               <>
@@ -97,6 +165,56 @@ const projects = await Promise.all(
     width: 85%;
     margin: 0 0 0 auto;
   }
+  .github-stats {
+    margin-top: 4px;
+  }
+  .contribution-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .contribution-stat {
+    display: block;
+    border-radius: 15px;
+    background-color: #f5f5f5;
+    padding: 16px 4px;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+  }
+  .contribution-stat:hover {
+    background-color: #ececec;
+  }
+  .contribution-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2563eb;
+  }
+  .contribution-stat-label {
+    font-size: 12px;
+    color: gray;
+  }
+  .github-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .stat-box {
+    border-radius: 15px;
+    background-color: #f5f5f5;
+    padding: 10px 4px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: black;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: gray;
+  }
   .language-stats {
     margin-top: 4px;
   }
@@ -136,6 +254,9 @@ const projects = await Promise.all(
     color: gray;
   }
   .projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
     margin-top: 16px;
   }
   p {
@@ -149,6 +270,12 @@ const projects = await Promise.all(
     .profile {
       width: 100%;
       margin: 0;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .github-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 </style>
