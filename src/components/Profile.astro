@@ -4,7 +4,8 @@ import "@fontsource/mochiy-pop-one";
 import Link from "./Link.astro";
 import Icon from "../../public/icon.webp";
 
-import { PROFILE } from "../consts";
+import { fetchContributionStats } from "../lib/github";
+import { GITHUB_USERNAME, PROFILE } from "../consts";
 import { Image } from "astro:assets";
 
 export type Props = {
@@ -12,6 +13,7 @@ export type Props = {
 };
 
 const shortInMobile = Astro.props.shortInMobile ?? true;
+const contributionStats = await fetchContributionStats(GITHUB_USERNAME);
 ---
 
 <div class="profile-txts">
@@ -23,6 +25,20 @@ const shortInMobile = Astro.props.shortInMobile ?? true;
     <p class="profile-description">{PROFILE.description}</p>
   </div>
 </div>
+{
+  contributionStats && (
+    <div class="github-stats">
+      <div class="github-stat">
+        <p class="github-stat-value">{contributionStats.totalContributions.toLocaleString()}</p>
+        <p class="github-stat-label">Total Contributions</p>
+      </div>
+      <div class="github-stat">
+        <p class="github-stat-value">{contributionStats.lastYearContributions.toLocaleString()}</p>
+        <p class="github-stat-label">Past Year</p>
+      </div>
+    </div>
+  )
+}
 <div class={shortInMobile ? "profile-info" : ""}>
   <div>
     <div class="sub-head">
@@ -68,6 +84,28 @@ const shortInMobile = Astro.props.shortInMobile ?? true;
   }
   .profile-description {
     text-align: center;
+  }
+  .github-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 80%;
+    margin: 14px auto 0;
+  }
+  .github-stat {
+    border-radius: 15px;
+    background-color: #f5f5f5;
+    padding: 8px 4px;
+    text-align: center;
+  }
+  .github-stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: black;
+  }
+  .github-stat-label {
+    font-size: 11px;
+    color: gray;
   }
   .profile-link {
     width: 80%;

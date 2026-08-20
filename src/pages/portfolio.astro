@@ -1,0 +1,90 @@
+---
+import ContentsBlock from "../components/ContentsBlock.astro";
+import MarkDown from "../components/MarkDown.astro";
+import Profile from "../components/Profile.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+
+import { fetchRepoStats } from "../lib/github";
+import { GITHUB_USERNAME, PORTFOLIO_PROJECTS } from "../consts";
+import { getEntry, render } from "astro:content";
+
+const portfolio = await getEntry("specs", "portfolio");
+
+if (!portfolio) {
+  throw new Error("specs/portfolio.mdx was not found");
+}
+
+const { Content } = await render(portfolio);
+
+const projects = await Promise.all(
+  PORTFOLIO_PROJECTS.map(async ({ owner, repo }) => {
+    const stats = await fetchRepoStats(owner, repo, GITHUB_USERNAME);
+    return {
+      title: repo,
+      description: stats.description ?? "",
+      url: stats.url,
+      repository: stats.url,
+      commitCount: stats.commitCount,
+      tags: stats.language ? [stats.language] : []
+    };
+  })
+);
+---
+
+<MainLayout title="Portfolio">
+  <div class="layout" data-pagefind-ignore>
+    <div class="right">
+      <div class="profile">
+        <ContentsBlock>
+          <Profile shortInMobile={false} />
+        </ContentsBlock>
+      </div>
+    </div>
+    <div class="left">
+      <ContentsBlock>
+        <MarkDown>
+          <Content />
+        </MarkDown>
+        <div class="projects">
+          <h2>Projects</h2>
+          {projects.map((project) => <ProjectCard {...project} />)}
+        </div>
+      </ContentsBlock>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+  .profile {
+    overflow: hidden;
+    width: 85%;
+    margin: 0 0 0 auto;
+  }
+  .projects {
+    margin-top: 20px;
+  }
+  .projects h2 {
+    font-weight: 600;
+    font-size: 22px;
+    color: black;
+    margin-bottom: 12px;
+  }
+  p {
+    color: black;
+  }
+
+  @media screen and (max-width: 950px) {
+    .layout {
+      grid-template-columns: 100%;
+    }
+    .profile {
+      width: 100%;
+      margin: 0;
+    }
+  }
+</style>

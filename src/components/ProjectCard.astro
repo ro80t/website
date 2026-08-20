@@ -1,0 +1,101 @@
+---
+export type Props = {
+  title: string;
+  description: string;
+  url?: string;
+  repository?: string;
+  commitCount?: number | null;
+  tags: string[];
+};
+
+const { title, description, url, repository, commitCount, tags } = Astro.props;
+---
+
+<div class="card">
+  <div class="head">
+    <p class="title">{title}</p>
+    <div class="links">
+      {
+        url && (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            Site
+          </a>
+        )
+      }
+      {
+        repository && (
+          <a href={repository} target="_blank" rel="noopener noreferrer">
+            Repo
+          </a>
+        )
+      }
+    </div>
+  </div>
+  <p class="description">{description}</p>
+  {commitCount != null && <p class="commits">{commitCount.toLocaleString()} commits</p>}
+  {
+    tags.length > 0 && (
+      <ul class="tags">
+        {tags.map((tag) => (
+          <li>{tag}</li>
+        ))}
+      </ul>
+    )
+  }
+</div>
+
+<style>
+  .card {
+    overflow: hidden;
+    border-radius: 15px;
+    background-color: #f5f5f5;
+    padding: 16px 20px;
+    margin-bottom: 15px;
+  }
+  .head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+  }
+  .title {
+    font-weight: 600;
+    font-size: 18px;
+    color: black;
+  }
+  .links {
+    display: flex;
+    gap: 10px;
+  }
+  .links a {
+    font-size: 13px;
+    color: gray;
+  }
+  .links a:hover {
+    text-decoration: underline;
+  }
+  .description {
+    margin-top: 8px;
+    color: black;
+  }
+  .commits {
+    margin-top: 6px;
+    font-size: 13px;
+    color: gray;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 0;
+  }
+  .tags li {
+    list-style: none;
+    border-radius: 20px;
+    background-color: white;
+    padding: 3px 12px;
+    font-size: 12px;
+    color: gray;
+  }
+</style>

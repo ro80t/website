@@ -6,6 +6,8 @@ export const SITE_NAME = "WKTK.moe";
 export const SITE_DESCRIPTION =
   "プログラマー向けの記事やブログを投稿していきます。空いた時間に気軽にご覧ください。";
 
+export const GITHUB_USERNAME = "ro80t";
+
 export const PROFILE = {
   name: "ROBOT",
   description: "コードは気合で書けます。",
@@ -56,3 +58,14 @@ export const PROFILE = {
     }
   ]
 };
+
+export type PortfolioProjectRef = {
+  owner: string;
+  repo: string;
+};
+
+export const PORTFOLIO_PROJECTS: PortfolioProjectRef[] = [
+  { owner: "thunlights", repo: "distopia" },
+  { owner: "ro80t", repo: "envl" },
+  { owner: "ro80t", repo: "mankai" }
+];
