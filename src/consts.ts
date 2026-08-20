@@ -37,7 +37,7 @@ export const PROFILE = {
       icon: "/icon/github.webp"
     },
     {
-      url: "https://twitter.com/AlwaysHarapan",
+      url: "https://twitter.com/ro80t_dev",
       title: "Twitter",
       icon: "/icon/twitter.webp"
     },
