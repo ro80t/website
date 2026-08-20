@@ -1,0 +1,147 @@
+---
+export type Props = {
+  title: string;
+  description: string;
+  url?: string;
+  repository?: string;
+  totalCommitCount?: number | null;
+  authorCommitCount?: number | null;
+  tags: string[];
+};
+
+const { title, description, url, repository, totalCommitCount, authorCommitCount, tags } =
+  Astro.props;
+---
+
+<div class="card">
+  <div class="head">
+    <p class="title">{title}</p>
+    <div class="links">
+      {
+        url && (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            Site
+          </a>
+        )
+      }
+      {
+        repository && (
+          <a href={repository} target="_blank" rel="noopener noreferrer">
+            Repo
+          </a>
+        )
+      }
+    </div>
+  </div>
+  <p class="description">{description}</p>
+  <div class="footer">
+    {
+      (totalCommitCount != null || authorCommitCount != null) && (
+        <div class="commit-stats">
+          {totalCommitCount != null && (
+            <div class="commit-stat">
+              <p class="commit-stat-value">{totalCommitCount.toLocaleString()}</p>
+              <p class="commit-stat-label">Total Commits</p>
+            </div>
+          )}
+          {authorCommitCount != null && (
+            <div class="commit-stat">
+              <p class="commit-stat-value">{authorCommitCount.toLocaleString()}</p>
+              <p class="commit-stat-label">My Commits</p>
+            </div>
+          )}
+        </div>
+      )
+    }
+    {
+      tags.length > 0 && (
+        <ul class="tags">
+          {tags.map((tag) => (
+            <li>{tag}</li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 15px;
+    background-color: #f5f5f5;
+    padding: 16px 20px;
+  }
+  .head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+  }
+  .title {
+    font-weight: 600;
+    font-size: 18px;
+    color: black;
+  }
+  .links {
+    display: flex;
+    gap: 10px;
+  }
+  .links a {
+    font-size: 13px;
+    color: gray;
+  }
+  .links a:hover {
+    text-decoration: underline;
+  }
+  .description {
+    margin-top: 8px;
+    color: black;
+    flex-grow: 1;
+  }
+  .footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .commit-stats {
+    display: flex;
+    gap: 10px;
+  }
+  .commit-stat {
+    border-radius: 10px;
+    background-color: white;
+    padding: 6px 16px;
+    text-align: center;
+  }
+  .commit-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2563eb;
+  }
+  .commit-stat-label {
+    font-size: 11px;
+    color: gray;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 0;
+  }
+  .tags li {
+    list-style: none;
+    border-radius: 20px;
+    background-color: white;
+    padding: 3px 12px;
+    font-size: 12px;
+    color: gray;
+  }
+</style>

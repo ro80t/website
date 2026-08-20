@@ -37,6 +37,7 @@ jobs:
         run: npm run build
         env:
           BASE_PATH: /${{ env.PAGE_DIR }}/
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
