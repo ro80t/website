@@ -45,11 +45,11 @@ const projects = await Promise.all(
       <ContentsBlock>
         <MarkDown>
           <Content />
-        </MarkDown>
-        <div class="projects">
           <h2>Projects</h2>
-          {projects.map((project) => <ProjectCard {...project} />)}
-        </div>
+          <div class="not-prose projects">
+            {projects.map((project) => <ProjectCard {...project} />)}
+          </div>
+        </MarkDown>
       </ContentsBlock>
     </div>
   </div>
@@ -66,13 +66,7 @@ const projects = await Promise.all(
     margin: 0 0 0 auto;
   }
   .projects {
-    margin-top: 20px;
-  }
-  .projects h2 {
-    font-weight: 600;
-    font-size: 22px;
-    color: black;
-    margin-bottom: 12px;
+    margin-top: 16px;
   }
   p {
     color: black;

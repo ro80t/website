@@ -4,7 +4,7 @@ import "@fontsource/mochiy-pop-one";
 import Link from "./Link.astro";
 import Icon from "../../public/icon.webp";
 
-import { fetchContributionStats } from "../lib/github";
+import { fetchContributionStats, fetchLanguageStats, getLanguageColor } from "../lib/github";
 import { GITHUB_USERNAME, PROFILE } from "../consts";
 import { Image } from "astro:assets";
 
@@ -14,6 +14,15 @@ export type Props = {
 
 const shortInMobile = Astro.props.shortInMobile ?? true;
 const contributionStats = await fetchContributionStats(GITHUB_USERNAME);
+const languageStats = await fetchLanguageStats(GITHUB_USERNAME);
+
+const githubProfileUrl = `https://github.com/${GITHUB_USERNAME}`;
+
+const formatDate = (date: Date) => date.toISOString().slice(0, 10);
+const now = new Date();
+const oneYearAgo = new Date(now);
+oneYearAgo.setUTCFullYear(now.getUTCFullYear() - 1);
+const pastYearUrl = `${githubProfileUrl}?tab=overview&from=${formatDate(oneYearAgo)}&to=${formatDate(now)}`;
 ---
 
 <div class="profile-txts">
@@ -28,14 +37,42 @@ const contributionStats = await fetchContributionStats(GITHUB_USERNAME);
 {
   contributionStats && (
     <div class="github-stats">
-      <div class="github-stat">
+      <a class="github-stat" href={githubProfileUrl} target="_blank" rel="noopener noreferrer">
         <p class="github-stat-value">{contributionStats.totalContributions.toLocaleString()}</p>
         <p class="github-stat-label">Total Contributions</p>
-      </div>
-      <div class="github-stat">
+      </a>
+      <a class="github-stat" href={pastYearUrl} target="_blank" rel="noopener noreferrer">
         <p class="github-stat-value">{contributionStats.lastYearContributions.toLocaleString()}</p>
         <p class="github-stat-label">Past Year</p>
+      </a>
+    </div>
+  )
+}
+{
+  languageStats && languageStats.length > 0 && (
+    <div class="language-stats">
+      <p class="sub-head-label">使用言語</p>
+      <div class="language-bar">
+        {languageStats.map((lang) => (
+          <span
+            class="language-bar-segment"
+            style={`width: ${lang.percentage}%; background-color: ${getLanguageColor(lang.name)};`}
+            title={`${lang.name} ${lang.percentage.toFixed(1)}%`}
+          />
+        ))}
       </div>
+      <ul class="language-legend">
+        {languageStats.map((lang) => (
+          <li>
+            <span
+              class="language-dot"
+              style={`background-color: ${getLanguageColor(lang.name)};`}
+            />
+            <span>{lang.name}</span>
+            <span class="language-percentage">{lang.percentage.toFixed(1)}%</span>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
@@ -93,10 +130,16 @@ const contributionStats = await fetchContributionStats(GITHUB_USERNAME);
     margin: 14px auto 0;
   }
   .github-stat {
+    display: block;
     border-radius: 15px;
     background-color: #f5f5f5;
     padding: 8px 4px;
     text-align: center;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+  }
+  .github-stat:hover {
+    background-color: #ececec;
   }
   .github-stat-value {
     font-size: 20px;
@@ -105,6 +148,52 @@ const contributionStats = await fetchContributionStats(GITHUB_USERNAME);
   }
   .github-stat-label {
     font-size: 11px;
+    color: gray;
+  }
+  .language-stats {
+    width: 80%;
+    margin: 14px auto 0;
+  }
+  .sub-head-label {
+    text-align: center;
+    font-family: "Mochiy Pop One", sans-serif;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .language-bar {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    height: 10px;
+    border-radius: 6px;
+    background-color: #f5f5f5;
+  }
+  .language-bar-segment {
+    height: 100%;
+  }
+  .language-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 12px;
+    margin-top: 10px;
+    padding: 0;
+  }
+  .language-legend li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    font-size: 12px;
+    color: black;
+  }
+  .language-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .language-percentage {
     color: gray;
   }
   .profile-link {
