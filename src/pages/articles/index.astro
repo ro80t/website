@@ -17,7 +17,10 @@ const articles = await getCollection("articles");
       {
         articles.map(({ data, id }) =>
           !data.draft ? (
-            <ArticleLink title={data.title} url={`${import.meta.env.BASE_URL}articles/${id}`} />
+            <ArticleLink
+              title={data.title}
+              url={data.url ?? `${import.meta.env.BASE_URL}articles/${id}`}
+            />
           ) : null
         )
       }
