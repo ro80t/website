@@ -2,6 +2,7 @@ import { getCollection } from "astro:content";
 import { OGImageRoute } from "astro-og-canvas";
 
 import { SITE_NAME, SITE_DESCRIPTION } from "../../consts";
+import { excerptFromHtml } from "../../lib/excerpt";
 
 const articles = await getCollection("articles", ({ data }) => !data.draft);
 
@@ -10,7 +11,8 @@ const pages = Object.fromEntries(
     article.id,
     {
       title: article.data.title,
-      description: article.data.description ?? SITE_DESCRIPTION
+      description:
+        article.data.description ?? excerptFromHtml(article.rendered?.html) ?? SITE_DESCRIPTION
     }
   ])
 );
