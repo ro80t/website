@@ -6,6 +6,7 @@ export const collections = {
     loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/articles" }),
     schema: z.object({
       title: z.string(),
+      description: z.string().optional(),
       pubDate: z.coerce.date(),
       updatedDate: z.coerce.date(),
       url: z.string().optional(),
