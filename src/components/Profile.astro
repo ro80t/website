@@ -25,7 +25,7 @@ const pastYearUrl = getPastYearContributionUrl(GITHUB_USERNAME);
 
 <div class="profile-txts">
   <div>
-    <Image class="profile-icon" src={Icon} alt="" />
+    <Image class="profile-icon" fetchpriority="high" loading="eager" src={Icon} alt="" />
   </div>
   <div>
     <p class="profile-name">{PROFILE.name}</p>
