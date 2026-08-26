@@ -24,6 +24,9 @@ import rehypeExternalLinks from "rehype-external-links";
 export default defineConfig({
   site: "https://wktk.moe",
   base: process.env.BASE_PATH || "/",
+  image: {
+    layout: "constrained"
+  },
   integrations: [
     partytown({
       config: {
