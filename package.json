@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@types/hast": "^3.0.5",
-    "@types/unist": "^3.0.3"
+    "@types/unist": "^3.0.3",
+    "skills": "^1.5.23"
   }
 }
