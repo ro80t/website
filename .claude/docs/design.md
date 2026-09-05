@@ -1,5 +1,17 @@
 # Design
 
+## Component design philosophy: thinking in Atomic Design
+
+`src/components/` is a flat directory — there are no `atoms/`/`molecules/`/`organisms/` folders, and this doc isn't asking you to create them. Atomic Design is used here as a **mental model for judging where a new piece of UI belongs and how small it should be**, not as an enforced file layout. When adding or refactoring a component, place it on this spectrum and let that judgment guide how much it should know about site-wide data/layout vs. how reusable/context-free it stays:
+
+- **Atoms** — a single-responsibility, presentation-only primitive with no composition of other components and no knowledge of site data. e.g. `Loading.astro`.
+- **Molecules** — a small, focused combination of markup/atoms that still doesn't know about site-wide data or layout. e.g. `Link.astro` (icon + title + url row), `ContentsBlock.astro` (the rounded white card shell reused across pages), `ProjectCard.astro`, `ArticleLink.astro` (composes `ContentsBlock`).
+- **Organisms** — a larger, self-contained section that assembles molecules/atoms and is allowed to reach into site-wide data (`consts.ts`, content collections, `lib/github.ts`). e.g. `Header.astro`, `Footer.astro`, `Profile.astro`, `Search.astro`, `MarkDown.astro`.
+- **Templates** — page skeletons (`Layout.astro`, `MainLayout.astro`, `BlogLayout.astro`) that arrange organisms into a shape, with no real content of their own — see the Layout hierarchy in `astro.md`.
+- **Pages** — `src/pages/**/*.astro`, which fill a template with real data (`getCollection`, route props) for one route.
+
+Practical implication: prefer pushing data-fetching and site-specific knowledge (imports from `consts.ts`, `astro:content`, `lib/github.ts`) up toward organisms/pages, and keep atoms/molecules taking plain props so they stay reusable — as the existing components above already do.
+
 ## Styling stack
 
 Tailwind CSS v4 via the `@tailwindcss/vite` plugin (registered in `astro.config.mjs`'s `vite.plugins`) plus `@tailwindcss/typography`. Both are pulled in with a single `@import`/`@plugin` pair in `src/styles/global.css`, which is otherwise minimal (just a page `background-color: #e5e7eb`). There's no separate Tailwind config file or design-token file — utility classes and per-component `<style>` blocks (scoped by default in `.astro` files) are the two styling mechanisms in use; reach for Tailwind utilities first, and drop into a scoped `<style>` block for layout/positioning that's awkward as utility classes (as `Header.astro`, `MainLayout.astro`, `BlogLayout.astro` already do).
