@@ -26,14 +26,14 @@ export const { getStaticPaths, GET } = await OGImageRoute({
   getImageOptions: (_path, page: { title: string; description: string }) => ({
     title: page.title,
     description: page.description,
-    padding: 80,
+    padding: 100,
     logo: {
       path: "./public/icon.png",
       size: [96]
     },
     bgGradient: [
-      [15, 23, 42],
-      [6, 78, 59]
+      [255, 255, 255],
+      [255, 255, 255]
     ],
     border: {
       color: [0, 250, 154],
@@ -43,24 +43,26 @@ export const { getStaticPaths, GET } = await OGImageRoute({
     // Fonts served as a single, non-chunked file covering the full Japanese
     // character set (unlike the @fontsource packages used on the site itself,
     // which split glyphs across many unicode-range files for the browser).
+    // M PLUS 1 matches the rounded, friendly sans used elsewhere on the site
+    // (see design.md) and reads closer to Zenn/Qiita's OG cards than Noto Sans JP.
     fonts: [
-      "https://api.fontsource.org/v1/fonts/noto-sans-jp/japanese-700-normal.ttf",
-      "https://api.fontsource.org/v1/fonts/noto-sans-jp/japanese-400-normal.ttf"
+      "https://api.fontsource.org/v1/fonts/m-plus-1/japanese-700-normal.ttf",
+      "https://api.fontsource.org/v1/fonts/m-plus-1/japanese-400-normal.ttf"
     ],
     font: {
       title: {
-        size: 56,
-        lineHeight: 1.4,
+        size: 64,
+        lineHeight: 1.3,
         weight: "Bold",
-        color: [255, 255, 255],
-        families: ["Noto Sans JP Thin"]
+        color: [17, 24, 39],
+        families: ["M PLUS 1 Thin"]
       },
       description: {
-        size: 30,
-        lineHeight: 1.6,
+        size: 28,
+        lineHeight: 1.5,
         weight: "Normal",
-        color: [186, 199, 214],
-        families: ["Noto Sans JP Thin"]
+        color: [75, 85, 99],
+        families: ["M PLUS 1 Thin"]
       }
     }
   })
