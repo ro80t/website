@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import { unified } from "@astrojs/markdown-remark";
 
 // @ts-expect-error this lib dont have .d.ts
 import remarkLinkCard from "remark-link-card";
@@ -45,42 +46,44 @@ export default defineConfig({
     mdx()
   ],
   markdown: {
-    remarkPlugins: [
-      [remarkLinkCard, { shortenUrl: true }],
-      remarkMath,
-      remarkGithubAdmonitionsToDirectives,
-      remarkDirective,
-      remarkSectionize
-    ],
-    rehypePlugins: [
-      rehypeKatex,
-      rehypeSlug,
-      rehypeRaw,
-      [rehypeExternalLinks, { target: "_blank" }],
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: "append",
-          properties: {
-            className: ["anchor"]
-          },
-          content: {
-            type: "element",
-            tagName: "span",
+    processor: unified({
+      remarkPlugins: [
+        [remarkLinkCard, { shortenUrl: true }],
+        remarkMath,
+        remarkGithubAdmonitionsToDirectives,
+        remarkDirective,
+        remarkSectionize
+      ],
+      rehypePlugins: [
+        rehypeKatex,
+        rehypeSlug,
+        rehypeRaw,
+        [rehypeExternalLinks, { target: "_blank" }],
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: "append",
             properties: {
-              className: ["anchor-icon"],
-              "data-pagefind-ignore": true
+              className: ["anchor"]
             },
-            children: [
-              {
-                type: "text",
-                value: "#"
-              }
-            ]
+            content: {
+              type: "element",
+              tagName: "span",
+              properties: {
+                className: ["anchor-icon"],
+                "data-pagefind-ignore": true
+              },
+              children: [
+                {
+                  type: "text",
+                  value: "#"
+                }
+              ]
+            }
           }
-        }
+        ]
       ]
-    ]
+    })
   },
   vite: {
     plugins: [tailwindcss()]
