@@ -1,3 +1,0 @@
-Sitemap: https://wktk.moe/sitemap-index.xml
-User-agent: *
-Disallow: 
