@@ -1,4 +1,4 @@
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import { OGImageRoute } from "astro-og-canvas";
 
 import { SITE_NAME, SITE_DESCRIPTION } from "../../consts";
@@ -20,6 +20,14 @@ const pages = Object.fromEntries(
 // Fallback image used for non-article pages, see Layout.astro.
 pages["_site"] = { title: SITE_NAME, description: SITE_DESCRIPTION };
 
+const portfolio = await getEntry("specs", "portfolio");
+if (portfolio) {
+  // specs entries are .mdx (deferred-rendered as components, not pre-rendered
+  // HTML) and have no `description` field, so there's no excerpt to pull here
+  // — reuse the site-wide description like the `_site` fallback above.
+  pages["portfolio"] = { title: portfolio.data.title, description: SITE_DESCRIPTION };
+}
+
 export const { getStaticPaths, GET } = await OGImageRoute({
   pages,
 
@@ -40,11 +48,10 @@ export const { getStaticPaths, GET } = await OGImageRoute({
       width: 6,
       side: "block-end"
     },
-    // Fonts served as a single, non-chunked file covering the full Japanese
-    // character set (unlike the @fontsource packages used on the site itself,
-    // which split glyphs across many unicode-range files for the browser).
-    // M PLUS 1 matches the rounded, friendly sans used elsewhere on the site
-    // (see design.md) and reads closer to Zenn/Qiita's OG cards than Noto Sans JP.
+    // astro-og-canvas renders server-side, so fonts load as single TTFs covering
+    // the full Japanese character set, unlike the @fontsource packages elsewhere
+    // on the site which split glyphs across per-unicode-range files for browsers.
+    // M PLUS 1 mirrors the site's own body font and reads closer to Zenn/Qiita.
     fonts: [
       "https://api.fontsource.org/v1/fonts/m-plus-1/japanese-700-normal.ttf",
       "https://api.fontsource.org/v1/fonts/m-plus-1/japanese-400-normal.ttf"
