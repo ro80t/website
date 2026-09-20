@@ -15,7 +15,7 @@
     "@astrojs/mdx": "^8.0.1",
     "@astrojs/partytown": "^2.1.7",
     "@astrojs/rss": "^4.0.19",
-    "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/sitemap": "^3.7.4",
     "@eslint/compat": "^2.1.0",
     "@eslint/js": "^10.0.1",
     "@fontsource-variable/m-plus-1": "^5.3.0",
