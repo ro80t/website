@@ -34,7 +34,7 @@
     "hast-util-from-html": "^2.0.3",
     "hast-util-to-text": "^4.0.2",
     "pagefind": "^1.5.2",
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.9",
     "prettier-plugin-astro": "^0.14.1",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-external-links": "^3.0.0",
