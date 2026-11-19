@@ -27,7 +27,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.2",
     "astro-icon": "^1.2.0",
-    "astro-og-canvas": "^0.13.2",
+    "astro-og-canvas": "^0.13.3",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-astro": "^3.2.1",
